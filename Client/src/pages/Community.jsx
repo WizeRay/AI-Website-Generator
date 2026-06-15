@@ -3,6 +3,7 @@ import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate,Link } from "react-router";
 import Footer from "../components/Footer";
 
+
 function Community() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);

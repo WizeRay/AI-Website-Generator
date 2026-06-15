@@ -7,6 +7,8 @@ import MyProjects from '../pages/MyProjects';
 import View from '../pages/View';
 import Preview from '../pages/Preview';
 import RootLayout from '../layouts/RootLayout';
+import { Component } from 'lucide-react';
+import ProjectLayout from '../layouts/ProjectLayout';
 
 export const router = createBrowserRouter([
     
@@ -21,10 +23,6 @@ export const router = createBrowserRouter([
             {
                 path:"pricing",
                 Component: Pricing,
-            },
-            {
-                path:"projects/:projectId",
-                Component: Projects,
             },
             {
                 path:"projects",
@@ -48,5 +46,14 @@ export const router = createBrowserRouter([
             },
         
         ]
+},
+{
+    Component:ProjectLayout,
+    children:[
+        {
+            path:"projects/:projectId",
+            Component: Projects,
+        },
+    ]
 }
 ]);

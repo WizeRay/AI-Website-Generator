@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate } from "react-router";
-
+import { dummyProjects } from "../assets/assets";
 function MyProjects() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);
@@ -9,27 +9,13 @@ function MyProjects() {
   const navigate = useNavigate();
 
   const fetchProjects = async () => {
-    setProjects(
-      ...projects,[
-        {
-    id: "",
-    name: "",
-    initial_prompt: "",
-    current_code: "",
-    createdAt: "",
-    updatedAt: "",
-    userId: "",
-    user: null,
-    isPublished: false,
-    versionId: "",
-    conversation: [],
-    versions: [],
-    current_version_index: ""
-}
-      ]
-    )
+    
     //Simulate loading
     setTimeout(()=>{
+      setProjects(
+      dummyProjects
+      
+    )
       setLoading(false)
     },2000)
     
@@ -87,7 +73,7 @@ function MyProjects() {
                     </div>
                     <p className="text-gray-400 mt-1 text-sm line-clamp-2">{project.initial_prompt}</p>
                     <div onClick={(e)=>e.stopPropagation()} 
-                    className="flwx justify-between items-centre mt-6">
+                    className="flex justify-between items-center mt-6">
                       <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                       <div className="flex gap-3 text-white text-sm">
                         <button onClick={()=> navigate(`/preview/${project.id}`)} className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all">Preview</button>
