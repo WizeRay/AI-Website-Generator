@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { useNavigate } from "react-router";
+
+
 
 function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
-
+    const navigate = useNavigate();
   return (
     <div>
        <nav className="z-50 flex items-center justify-between w-full py-4 px-4 md:px-16 lg:px-24 xl:px-32 backdrop-blur border-b text-white border-slate-800">
@@ -18,10 +21,14 @@ function Navbar() {
           </div>
 
           <div className="hidden md:block space-x-3">
-            <button className="active:scale-95 hover:bg-indigo-700/20 transition px-4 py-2 border border-indigo-600 rounded-md">
+            <button 
+            onClick={()=> navigate("/login")}
+            className="active:scale-95 hover:bg-indigo-700/20 transition px-4 py-2 border border-indigo-600 rounded-md">
               Sign in
             </button>
-            <button className="px-6 py-2 bg-indigo-600 active:scale-95 hover:bg-indigo-700 transition rounded-md">
+            <button 
+            onClick={()=> navigate("/signUp")}
+            className="px-6 py-2 bg-indigo-600 active:scale-95 hover:bg-indigo-700 transition rounded-md">
               Get started
             </button>
           </div>

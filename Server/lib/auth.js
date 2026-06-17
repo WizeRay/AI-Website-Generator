@@ -1,14 +1,12 @@
 import 'dotenv/config';
 import { betterAuth } from "better-auth";
-import { pool } from "../config/db";
+import { pool } from '../config/db.js';
 
 const trustedOrigins = process.env.TRUSTED_ORIGINS?.split(',') || [];
 
 const auth = betterAuth(
     {
-        database: new pool({
-
-        }),
+        database: pool,
         emailAndPassword: { 
             enabled: true, 
         },
@@ -21,7 +19,7 @@ const auth = betterAuth(
                     name: 'auth_session',
                     attributes:{
                         httpOnly:true,
-                        secure: process.env.NODE_ENV,
+                        secure: process.env.NODE_ENV === "development"?false : true ,
                         sameSite: 'none',
                         path:'/',
                     }
