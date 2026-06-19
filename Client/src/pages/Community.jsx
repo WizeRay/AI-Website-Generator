@@ -9,6 +9,7 @@ function Community() {
   const [projects,setProjects] = useState([]);
 
   const navigate = useNavigate();
+  
 
   const fetchProjects = async () => {
     setProjects(

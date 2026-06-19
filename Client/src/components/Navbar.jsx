@@ -1,14 +1,20 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { useNavigate } from "react-router";
-
-
+import { useSession } from "../../lib/auth-client";
+import ProfileAvatar from "./ProfileAvatar";
 
 function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const {data:session, isPending} = useSession();
+    if(isPending){
+      return <p>Loading..</p>
+    }
   return (
+    
     <div>
+      {/* {console.log(session)} */}
        <nav className="z-50 flex items-center justify-between w-full py-4 px-4 md:px-16 lg:px-24 xl:px-32 backdrop-blur border-b text-white border-slate-800">
         <Link to="/" className="font-extrabold text-2xl">
               SiteBuilder
@@ -17,9 +23,10 @@ function Navbar() {
           <div className="hidden md:flex items-center gap-8 transition duration-500">
             <Link to="/">Home</Link>
             <Link to="/community">Community</Link>
+            <Link to="/projects">My Projects</Link>
             <Link to="pricing">Pricing</Link>
           </div>
-
+          {!session ? (
           <div className="hidden md:block space-x-3">
             <button 
             onClick={()=> navigate("/login")}
@@ -32,6 +39,9 @@ function Navbar() {
               Get started
             </button>
           </div>
+          )
+        :
+        <ProfileAvatar user = {session.user}/>}
 
           <button id="open-menu" className="md:hidden active:scale-90 transition" onClick={() => setMenuOpen(true)} >
             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>

@@ -4,6 +4,7 @@ import { useState,useEffect, useRef } from "react";
 import { dummyConversations, dummyProjects, dummyVersion } from "../assets/assets";
 import Sidebar from "../components/Sidebar";
 import ProjectPreview from "../components/ProjectPreview";
+import { useSession } from "../../lib/auth-client";
 
 function Projects() {
   const {projectId} = useParams();
@@ -19,7 +20,20 @@ function Projects() {
   const [isSaving, setisSaving] = useState(false);
 
   const previewRef = useRef(null);
-
+  const { data: session, isPending } = useSession();
+  
+    if (isPending) {
+      return (
+        <div className="flex justify-center mt-20">
+          Loading...
+        </div>
+      );
+    }
+  
+    if (!session) {
+      navigate("/login");
+      return null;
+    }
 const fetchProject = async () =>{
 //fetch request
 const findProject = dummyProjects.find(project => project.id === projectId);

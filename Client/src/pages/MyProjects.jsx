@@ -2,11 +2,29 @@ import { useState,useEffect } from "react";
 import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { dummyProjects } from "../assets/assets";
+import { useSession } from "../../lib/auth-client";
+
+
 function MyProjects() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);
 
   const navigate = useNavigate();
+
+  const { data: session, isPending } = useSession();
+  
+    if (isPending) {
+      return (
+        <div className="flex justify-center mt-20">
+          Loading...
+        </div>
+      );
+    }
+  
+    if (!session) {
+      navigate("/login");
+      return null;
+    }
 
   const fetchProjects = async () => {
     

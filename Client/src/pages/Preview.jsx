@@ -3,12 +3,26 @@ import { useParams } from "react-router";
 import { dummyProjects } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import ProjectPreview from "../components/ProjectPreview";
-
+import { useSession } from "../../lib/auth-client";
 
 function Preview() {
   const [code, setCode] = useState("");
   const [loading,setLoading] = useState(true);
   const {projectId, versionId} = useParams();
+  const { data: session, isPending } = useSession();
+  
+    if (isPending) {
+      return (
+        <div className="flex justify-center mt-20">
+          Loading...
+        </div>
+      );
+    }
+  
+    if (!session) {
+      navigate("/login");
+      return null;
+    }
 
   const fetchCode = async () => {
     setTimeout(()=>{

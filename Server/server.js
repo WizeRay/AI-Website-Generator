@@ -1,10 +1,13 @@
-import"dotenv/config";
+import "dotenv/config";
 
 import express from "express";
 import cors from 'cors';
-import { pool } from "./config/db.js";
+import { pool } from "./src/config/db.js";
 import {toNodeHandler} from 'better-auth/node'
-import auth from "./lib/auth.js";
+import {auth} from "./src/lib/auth.js";
+import cookieParser from "cookie-parser";
+
+import projectRoutes from './src/routes/projects.routes.js';
 
 const app = express();
 
@@ -17,6 +20,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+//--Body Parsers--
+app.use(express.json());
+app.use(cookieParser());
+
+//--Better Auth Route Handler--
 app.all('/api/auth/{*any}', toNodeHandler(auth));
 
 const testDB =async () => {
@@ -29,11 +37,10 @@ const testDB =async () => {
 //     console.log(result.rows);
 // }
 
-app.get("/",(req,res)=>{
-    res.send("Server is live!");
-    // getusers();
-})
+//--Application Routes--
+app.use('/api/projects', projectRoutes);
 
+//--Server start--
 app.listen(PORT, ()=>{
     console.log(`Server is running at http://localhost:${PORT}`);
     testDB();
