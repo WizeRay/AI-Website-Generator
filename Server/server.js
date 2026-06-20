@@ -7,7 +7,8 @@ import {toNodeHandler} from 'better-auth/node'
 import {auth} from "./src/lib/auth.js";
 import cookieParser from "cookie-parser";
 
-import projectRoutes from './src/routes/projects.routes.js';
+import projectRoutes from './src/routes/projects.route.js';
+import userRoutes from "./src/routes/user.route.js"
 
 const app = express();
 
@@ -39,6 +40,8 @@ const testDB =async () => {
 
 //--Application Routes--
 app.use('/api/projects', projectRoutes);
+app.use('/api/user', userRoutes);
+
 
 //--Server start--
 app.listen(PORT, ()=>{
