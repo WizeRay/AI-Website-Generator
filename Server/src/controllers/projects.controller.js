@@ -13,11 +13,12 @@ export const getAllProjects = async (req, res) => {
       [userId],
     );
 
-    res.json({
+    res.staus(200).json({
       projects: result.rows,
       count: result.rowCount,
     });
   } catch (err) {
+
     console.error("Error fetching projects:", err);
     res.status(500).json({ error: "Failed to fetch projects" });
   }
@@ -42,7 +43,7 @@ export const createNewProject = async (req, res) => {
             SELECT *
             FROM "user"
             WHERE id = $1
-            RETURNING id,credits
+            
         `,
       [userId],
     );
@@ -260,4 +261,66 @@ export const createNewProject = async (req, res) => {
 };
 
 //controller function to get single project
-export const getP
+export const getProject = async (req,res) => {
+    
+    try {
+
+        const {projectId} = req.params;
+        const userId = req.user.id;
+        
+        const project = await pool.query(`
+            SELECT *
+            FROM website_project
+            WHERE id = $1 AND user_id = $2
+        `,[projectId,userId]);
+
+        const projectData = project.rows[0];
+        if (project.rows.length === 0) {
+        return res.status(404).json({
+            message: "Project unavailable"
+        });
+
+        return res.status(200).json({
+            project: projectData,
+        });
+        
+    }
+    } catch (err) {
+
+        console.error('Error fetching project:', err);
+        res.status(500).json({ error: 'Failed to fetch project'});
+    }
+      
+}
+
+//Controller function to toggle Project Publish
+export const toggleProjectPublish = async (req,res) => {
+     try {
+        const userId = req.userId;
+        const {projectId} = req.params;
+
+        const isPublishedQuery = await pool.query(`
+            UPDATE website_project
+            SET is_published = NOT is_published
+            WHERE id = $1 AND user_id = $2
+            RETURNING is_published
+        `,[userId,projectId]);
+
+        if(isPublishedQuery.rows.length() === 0){
+            return res.status(404).json({ message: "Project not found."});
+        }
+
+        const isPublished = isPublishedQuery.rows[0].is_published;
+
+        return res.status(200).json({ 
+            message: isPublished ? "Project Published" : "Project Unpublished",
+            isPublished,
+        })
+
+
+
+     } catch (err) {
+        console.error('Error while updating toggle:', err);
+        return res.status(500).json({ error: 'Failed to update project status'});
+     }
+}

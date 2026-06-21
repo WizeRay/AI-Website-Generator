@@ -22,11 +22,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 //--Body Parsers--
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 //--Better Auth Route Handler--
 app.all('/api/auth/{*any}', toNodeHandler(auth));
+
+
 
 const testDB =async () => {
     const result = await pool.query("SELECT NOW()");
