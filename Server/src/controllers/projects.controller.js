@@ -104,7 +104,7 @@ export const createNewProject = async (req, res) => {
     //Enhance prompt
 
     const promptEnhanceResponce = await openai.chat.completions.create({
-      model: process.env.AI_MODEL_API_KEY,
+      model: process.env.AI_MODEL,
       messages: [
         {
           role: "system",
@@ -165,7 +165,7 @@ export const createNewProject = async (req, res) => {
     //Generate website code;
 
     const codeGenerationResponse = await openai.chat.completions.create({
-      model: process.env.AI_MODEL_API_KEY,
+      model: process.env.AI_MODEL,
       messages: [
         {
           role: "system",
@@ -198,7 +198,7 @@ export const createNewProject = async (req, res) => {
         },
         {
             role: 'user',
-            content: enhancedPrompt || '',
+            content: enhancedPrompt || ``,
         }
       ]
     });
