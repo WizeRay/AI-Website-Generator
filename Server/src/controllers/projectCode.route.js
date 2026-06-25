@@ -168,14 +168,13 @@ export const makeRevision = async (req,res) => {
 //Controller Function to rollback to previous version
 export const rollbackToPrevVersion = async (req,res) => {
     try {
+        // Add transactions later..
         const userId = req.user.id;
-        if(!userId){
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
+        
         const { projectId, versionId } = req.params;
 
         const project = await pool.query(`
-            SELECT current_version_index
+            SELECT id
             FROM website_project
             WHERE id =$1 AND user_id = $2
         `,[projectId,userId]);
@@ -201,7 +200,8 @@ export const rollbackToPrevVersion = async (req,res) => {
         await pool.query(`
         UPDATE website_project
         SET current_code = $1,
-            current_version_index = $2
+            current_version_index = $2,
+            updated_at = NOW()
         
         WHERE id = $3 AND user_id = $4
         `,[ version.code,version.id,projectId,userId ]);
@@ -211,7 +211,7 @@ export const rollbackToPrevVersion = async (req,res) => {
             VALUES (
             'assistant',
             'I've rolled back your website to selected version. You can now preview it',
-            $1,
+            $1
             )
         `,[projectId])
 
@@ -222,4 +222,31 @@ export const rollbackToPrevVersion = async (req,res) => {
         res.status(500).json({ error: 'Failed to rollback to selected version '}); 
     }
     
+}
+//Controler Function to Delete Project
+export const deleteProject = async (req,res) => {
+    try {
+        const userId = req.user.id;
+        const {projectId} = req.params;
+
+        if(!userId){
+            return res.status(401).json({message:"Unauthorized"});
+        }
+
+        const projectResult = await pool.query(`
+           DELETE FROM website_project
+           WHERE id = $1 AND user_id =$2
+            
+        `,[projectId,userId]);
+
+        if(projectResult.rowCount === 0){
+            return res.status(404).json({message: "Project not found"}) 
+        }
+
+        return res.status(200).json({message: "Project deleted successfully"})
+
+    } catch (err) {
+         console.error('Error deleting project:', err);
+        res.status(500).json({ error: 'Error deleting project'});
+    }
 }
