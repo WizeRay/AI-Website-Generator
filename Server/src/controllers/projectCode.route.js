@@ -45,7 +45,7 @@ export const makeRevision = async (req,res) => {
             VALUES (
             'user',
             $1,
-            $2,
+            $2
             )
             `,[message,projectId]);
          
@@ -133,11 +133,11 @@ export const makeRevision = async (req,res) => {
             INSERT INTO version (code,description,project_id)
             VALUES (
             $1,
-            'changes made',
-            $2)
+            $2,
+            $3)
             RETURNING id
             
-            `,[formatedCode,projectId]);
+            `,[formatedCode,message,projectId]);
         const versionId = version.rows[0].id;
         await pool.query(`
             INSERT INTO conversation (role,content,project_id)
@@ -152,8 +152,8 @@ export const makeRevision = async (req,res) => {
             SET 
                 current_code = $1,
                 current_version_index =$2
-            WHERE id = $3
-        `,[formatedCode,versionId,projectId])
+            WHERE id = $3 AND user_id = $4
+        `,[ formatedCode,versionId,projectId,userId ])
          
           return res.status(200).json({message: 'Changes made successfully'})                                                                                                                                                  
     } catch (err) {
@@ -248,5 +248,73 @@ export const deleteProject = async (req,res) => {
     } catch (err) {
          console.error('Error deleting project:', err);
         res.status(500).json({ error: 'Error deleting project'});
+    }
+}
+//Controller for getting project code for preview
+export const getPreviewCode = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { projectId } = req.params;
+
+        const result = await pool.query(
+            `
+            SELECT
+                current_code,
+                current_version_index
+            FROM website_project
+            WHERE id = $1
+              AND user_id = $2
+            `,
+            [projectId, userId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({
+                message: "Project not found",
+            });
+        }
+
+        const project = result.rows[0];
+
+        return res.status(200).json({
+            code: project.current_code,
+            versionId: project.current_version_index,
+        });
+
+    } catch (err) {
+        console.error("Error fetching preview code:", err);
+
+        return res.status(500).json({
+            message: "Failed to fetch preview code",
+        });
+    }
+};
+//Controller for getting published projects.
+export const getPublishedProjects = async (req,res) => {
+    try {
+
+        
+
+        const projectResult = await pool.query(`
+            SELECT
+                wp.id,
+                wp.name,
+                wp.current_code,
+                wp.created_at,
+                u.name AS author_name,
+                u.email
+            FROM website_project wp
+            JOIN "user" u
+            ON wp.user_id = u.id
+            WHERE wp.is_published = TRUE; 
+            ORDER BY wp.created_at DESC
+        `);
+
+        const projects = projectResult.rows;
+        return res.status(200).json({projects: projects})
+
+    } catch (err) {
+        console.error('Error fetching published Projects:', err);
+        res.status(500).json({ error: 'Failed to fetch published Projects '});
     }
 }

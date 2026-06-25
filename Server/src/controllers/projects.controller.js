@@ -324,3 +324,40 @@ export const toggleProjectPublish = async (req,res) => {
         return res.status(500).json({ error: 'Failed to update project status'});
      }
 }
+//Controller to save project
+ export const saveProjectCode = async (req,res) => {
+    try {
+      //making new version is left
+        const {projectId} = req.params;
+        const userId = req.user.id;
+        const {code} = req.body;
+        //validation required
+        if (typeof code !== "string" || code.trim() === "") {
+          return res.status(400).json({
+              message: "Code is required"
+          });
+}
+
+        const result = await pool.query(`
+            UPDATE website_project
+            SET
+                current_code = $1,
+                updated_at = NOW()
+            WHERE id = $2
+              AND user_id = $3
+            `,
+            [code, projectId, userId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+        return res.status(200).json({message: "Project updated"});
+
+    } catch (err) {
+      console.error('Error saving project:', err);
+        res.status(500).json({ error: 'Failed to save project'});
+    }
+ }
