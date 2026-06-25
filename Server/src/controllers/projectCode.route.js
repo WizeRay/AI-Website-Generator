@@ -167,5 +167,59 @@ export const makeRevision = async (req,res) => {
 }
 //Controller Function to rollback to previous version
 export const rollbackToPrevVersion = async (req,res) => {
+    try {
+        const userId = req.user.id;
+        if(!userId){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const { projectId, versionId } = req.params;
+
+        const project = await pool.query(`
+            SELECT current_version_index
+            FROM website_project
+            WHERE id =$1 AND user_id = $2
+        `,[projectId,userId]);
+
+        if(project.rows.length === 0){
+            return res.status(404).json({ message: "Project not found."})
+        }
+
+        const versionResult = await pool.query(
+            `
+            SELECT *
+            FROM version
+            WHERE id = $1
+            AND project_id = $2
+            `,
+            [versionId, projectId]
+        );
+        if(versionResult.rows.length === 0){
+            return res.status(404).json({message: "version not found"});
+        }
+        const version = versionResult.rows[0];
+
+        await pool.query(`
+        UPDATE website_project
+        SET current_code = $1,
+            current_version_index = $2
+        
+        WHERE id = $3 AND user_id = $4
+        `,[ version.code,version.id,projectId,userId ]);
+
+        await pool.query(`
+            INSERT INTO conversation (role,content,project_id)
+            VALUES (
+            'assistant',
+            'I've rolled back your website to selected version. You can now preview it',
+            $1,
+            )
+        `,[projectId])
+
+        return res.status(200).json({message : 'Version rolled back'});
+
+    } catch (err) {
+        console.error('Failed to rollback to previous version:', err);
+        res.status(500).json({ error: 'Failed to rollback to selected version '}); 
+    }
     
 }
