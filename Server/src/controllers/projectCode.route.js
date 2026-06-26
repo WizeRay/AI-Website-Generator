@@ -318,3 +318,34 @@ export const getPublishedProjects = async (req,res) => {
         res.status(500).json({ error: 'Failed to fetch published Projects '});
     }
 }
+//Controller for getting public projects
+export const getProjectById = async (req,res) => {
+    
+    try {
+
+        const {projectId} = req.params;
+        
+        const project = await pool.query(`
+            SELECT *
+            FROM website_project
+            WHERE id = $1 
+        `,[projectId]);
+
+        const projectData = project.rows[0];
+        if (project.rows.length === 0) {
+        return res.status(404).json({
+            message: "Project unavailable"
+        });
+
+        return res.status(200).json({
+            project: projectData,
+        });
+        
+    }
+    } catch (err) {
+
+        console.error('Error fetching project:', err);
+        res.status(500).json({ error: 'Failed to fetch project'});
+    }
+      
+}
