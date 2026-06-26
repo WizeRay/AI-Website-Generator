@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 
 import projectRoutes from './src/routes/projects.route.js';
 import userRoutes from "./src/routes/user.route.js"
+import projectCodeRoutes from './src/routes/projectCode.route.js'
 
 const app = express();
 
@@ -43,7 +44,7 @@ const testDB =async () => {
 //--Application Routes--
 app.use('/api/projects', projectRoutes);
 app.use('/api/user', userRoutes);
-
+app.use('/api/', projectCodeRoutes);
 
 //--Server start--
 app.listen(PORT, ()=>{

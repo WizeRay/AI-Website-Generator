@@ -1,6 +1,6 @@
 import { Router } from "express";
 import requireAuth from "../middlewares/requireAuth.js";
-import { deleteProject, getPreviewCode, getPublicProject, getPublishedProjects, makeRevision, rollbackToPrevVersion } from "../controllers/projectCode.route.js";
+import { deleteProject, getPreviewCode, getProjectById, getPublishedProjects, makeRevision, rollbackToPrevVersion } from "../controllers/projectCode.route.js";
 import { saveProjectCode } from "../controllers/projects.controller.js";
 
 const router = Router();
