@@ -1,44 +1,25 @@
 import { useState,useEffect } from "react";
 import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate,Link } from "react-router";
-import Footer from "../components/Footer";
-
+import api from "../configs/axios.config";
 
 function Community() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);
-
+  const [error,setError] = useState(null);
   const navigate = useNavigate();
   
 
   const fetchProjects = async () => {
-    setProjects(
-      ...projects,[
-        {
-    id: "",
-    name: "",
-    initial_prompt: "",
-    current_code: "",
-    createdAt: "",
-    updatedAt: "",
-    userId: "",
-    user: null,
-    isPublished: false,
-    versionId: "",
-    conversation: [],
-    versions: [],
-    current_version_index: ""
-}
-      ]
-    )
-    //Simulate loading
-    setTimeout(()=>{
-      setLoading(false)
-    },2000)
-    
-  }
-  const deleteProject = async (projectId)=>{ 
+    try {
+      const {data} = await api.get('/published');
+      setProjects(data.projects);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Something went wrong. Please try again."); 
 
+    }
   }
 
   useEffect(()=>{
@@ -94,14 +75,14 @@ function Community() {
                     </div>
                     <p className="text-gray-400 mt-1 text-sm line-clamp-2">{project.initial_prompt}</p>
                     <div 
-                    className="flwx justify-between items-centre mt-6">
-                      <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                    className="flex justify-between items-centre mt-6">
+                      <span>{new Date(project.created_at).toLocaleDateString()}</span>
                       <div className="flex gap-3 text-white text-sm">
                         <button onClick={()=> navigate(`/preview/${project.id}`)} 
                         className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all transition-colors flex items-centre gap-2"
                         >
-                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-centre justify-centre">{project.user?.name?.slice(0,1)}</span>
-                          {project.user?.name}
+                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-center justify-center">{project.author_name.slice(0,1)}</span>
+                          {project.author_name}
                         </button>
                       </div>
                     </div>

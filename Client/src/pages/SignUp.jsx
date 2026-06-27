@@ -50,7 +50,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <div className="w-full max-w-md bg-white rounded-xl shadow p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Create an account</h1>
 
@@ -110,7 +110,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+            className="w-full bg-indigo-700 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
           >
             {isLoading ? 'Creating account...' : 'Create account'}
           </button>

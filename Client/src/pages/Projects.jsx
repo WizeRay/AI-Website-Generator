@@ -1,11 +1,10 @@
 import { useNavigate,useParams,Link } from "react-router";
 import {Loader2Icon,MessageSquare, XIcon,SmartphoneIcon, TabletIcon, LaptopIcon, SaveIcon,FullscreenIcon, ArrowBigDownDash,EyeOffIcon,EyeIcon} from "lucide-react";
 import { useState,useEffect, useRef } from "react";
-import { dummyConversations, dummyProjects, dummyVersion } from "../assets/assets";
 import Sidebar from "../components/Sidebar";
 import ProjectPreview from "../components/ProjectPreview";
 import { useSession } from "../../lib/auth-client";
-
+import api from "../configs/axios.config";
 function Projects() {
   const {projectId} = useParams();
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ function Projects() {
 
   const[isMenuOpen,setIsMenuOpen] = useState(false);
   const [isSaving, setisSaving] = useState(false);
-
+  const [error,setError] = useState(null);
   const previewRef = useRef(null);
   const { data: session, isPending } = useSession();
   
@@ -35,32 +34,33 @@ function Projects() {
       return null;
     }
 const fetchProject = async () =>{
-//fetch request
-const findProject = dummyProjects.find(project => project.id === projectId);
-setTimeout(()=>{
-  if(findProject){
-    setProject({...findProject, conversation: dummyConversations,versions: dummyVersion})
-    
-    setLoading(false);
-    setIsGenerating(findProject.current_code ? false : true);
-  }
-},2000)
+try{
+  const {data} = await api.get(`/projects/${projectId}`);
+  setProject(data.project);
+  setIsGenerating(data.project.status === 'pending')
+  setLoading(false)
+} catch (err){
+  console.error(err);
+  setError(err.response?.data?.message || "Something went wrong. Please try again.");
+  setLoading(false);
+}
 
 }
 
 const togglePublish = async () => {
-  
+  try {
+      await api.patch(`/projects/${projectId}/publish`);
+      setProject((prev)=> prev ? ({...prev, isPublished : !prev.isPublished}) : null)
+  } catch (err) {
+    console.log(err);
+    setError(err.response?.data?.message || "Something went wrong. Please try again.");
+  }
 }
 
 // download code (index.html)
 const downloadCode = async () => {
-  const code = previewRef.current?.getCode() || project?.current_code;
-  if(!code){
-    if(isGenerating){
-      return
-    }
-    return
-  }
+  const code = previewRef.current.getCode() || project?.current_code;
+  if(!code) return;
   const element = document.createElement('a');
   const file = new Blob([code],{type:"text/html"});
   element.href = URL.createObjectURL(file);
@@ -69,15 +69,40 @@ const downloadCode = async () => {
   element.click();
 }
 const saveProject = async () => {
+  if(!previewRef.current) return;
+  const code = previewRef.current.getCode();
+  if(!code) return;
+  setisSaving(true);
+  try{
+    await api.put(`/save/${projectId}`,{code});
+
+  }catch(err){
+    console.log(err);
+    setError(err.response?.data?.message || "Something went wrong. Please try again.");
   
+  }finally{
+    setisSaving(false);
+  }
 }
 
-useEffect(() => {
+useEffect(()=>{
+  if(session.user){
+    fetchProject();
+  }else if(!isPending && !session.user){
+    navigate("/");
+    return setError( "Please login to view your project")
+  }
+},[session.user])
 
-fetchProject()
+useEffect(() => {
+if(project && !project.status === 'pending'){
+  const intervalid = setInterval(fetchProject,10000);
+  return ()=> clearInterval(intervalid)
+}
+
 //calling first time the component renders after reloading
   
-}, [])
+}, [project])
 
 if(loading){
   return(
@@ -119,6 +144,11 @@ return project ? (
 
           }
         </div>
+        {error && (
+              <p className="mt-3 text-center text-sm text-red-500">
+                  {error}
+              </p>
+            )}
       </div>
       {/* middle  */}
       <div className="hidden sm:flex gap-2 bg-gray-950 p-1.5 rounded-md">
@@ -167,7 +197,7 @@ return project ? (
       </div>
     </div>
     <div className="flex-1 flex overflow-auto">
-              <Sidebar isMenuOpen ={isMenuOpen} project={project} setProject={(p)=>setProject(p)} isGenerating={isGenerating} setIsGenerating={setIsGenerating}/>
+              {project ? <Sidebar isMenuOpen ={isMenuOpen} project={project} setProject={(p)=>setProject(p)} isGenerating={isGenerating} setIsGenerating={setIsGenerating}/>: <Loader2Icon className="animate-spin" size={16}/>}
               <div className="flex-1 p-2 pl-0">
                 <ProjectPreview ref={previewRef} project={project} isGenerating={isGenerating} device={device} />
               </div>

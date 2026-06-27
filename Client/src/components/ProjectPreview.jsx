@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react"
 import {iframeScript} from "../assets/assets"
 import EditorPanel from "./EditorPanel";
+import { Loader2Icon } from "lucide-react";
 
 function ProjectPreview({project, isGenerating,device = "desktop", showEditorPanel = true, ref}) {
   const iframeRef = useRef(null);
@@ -14,7 +15,7 @@ function ProjectPreview({project, isGenerating,device = "desktop", showEditorPan
 
   useImperativeHandle(ref,()=>({
     getCode: ()=>{
-      const doc = iframeRef.current?.contentDocument;
+      const doc = iframeRef.current.contentDocument;
       if(!doc) return undefined;
 
       // 1. Remove our selection class/ attributes/outline from all elements.
@@ -50,7 +51,7 @@ function ProjectPreview({project, isGenerating,device = "desktop", showEditorPan
   },[])
 
   const handleUpdate =(updates)=>{
-    if(iframeRef.current?.contentWindow){
+    if(iframeRef.current.contentWindow){
       iframeRef.current.contentWindow.postMessage({
         type:"UPDATE_ELEMENT",
         payload: updates
@@ -81,14 +82,16 @@ function ProjectPreview({project, isGenerating,device = "desktop", showEditorPan
           <EditorPanel selectedElement={selectedElement}
           onUpdate={handleUpdate} onClose={()=>{
             setSelectedElement(null);
-            if(iframeRef.current?.contentWindow){
+            if(iframeRef.current.contentWindow){
               iframeRef.current.contentWindow.postMessage({type:"CLEAR_SELECTION_REQUEST"},'*')
             }
           }} />
         )}
         </>
       ): isGenerating &&(
-        <div>loading</div>
+        <div className="flex items-center justify-center h-full">
+          <Loader2Icon className="size-7 animate-spin text-indigo-200"/>
+        </div>
       )}
     </div>
   )

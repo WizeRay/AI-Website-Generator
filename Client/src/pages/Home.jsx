@@ -1,19 +1,41 @@
 import { useState } from "react";
 import {Loader2Icon} from "lucide-react";
-import Navbar from "../components/Navbar";
 import { Link } from "react-router";
-
+import {  useSession } from "../../lib/auth-client";
+import { useNavigate } from "react-router";
+import api from "../configs/axios.config";
 function Home() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false)
+  const {data:session,isPending} = useSession();
+  const navigate = useNavigate();
+  const [error,setError] = useState("");
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    setLoading(true)
-
-    //Simulate API call
-    setTimeout(()=>{
-        setLoading(false)
-    },3000)
+    setError("");
+    try {
+      if(!session.user){
+        setError("Please sign in to create a project.")
+        return;
+      }
+      if(!input.trim()){
+        setError("Please enter a prompt.")
+        return;
+      }
+      setLoading(true)
+      const {data} = await api.post('/projects/create',{initial_prompt: input});
+      
+      navigate(`/projects/${data.projectId}`);
+    } catch (err) {
+        setError(
+                err.response.data.message ||
+                "Something went wrong. Please try again."
+        );
+        console.error(err);
+    }finally {
+      setLoading(false);
+    }
 
   }
 
@@ -40,15 +62,21 @@ function Home() {
         </p>
 
         <form onSubmit={onSubmitHandler} className="bg-white/10 max-w-2xl w-full rounded-xl p-4 mt-10 border border-indigo-600/70 focus-within:ring-2 ring-indigo-500 transition-all">
-          <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="Describe your presentation in details" required />
-          <button className="ml-auto flex items-center gap-2 bg-gradient-to-r from-[#CB52D4] to-indigo-600 rounded-md px-4 py-2">
+          <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="Describe your presentation in details"/>
+          <button 
+          disabled={loading || isPending}
+          className="ml-auto flex items-center gap-2 bg-gradient-to-r from-[#CB52D4] to-indigo-600 rounded-md px-4 py-2">
                 {!loading? 'Create with AI':
                 <>
                     Creating <Loader2Icon className="animate-spin size-4 text-white"/>
                 </>}
           </button>
         </form>
-
+           {error && (
+              <p className="mt-3 text-center text-sm text-red-500">
+                  {error}
+              </p>
+            )}
         <div className="flex flex-wrap items-center justify-center gap-16 md:gap-20 mx-auto mt-16">
         </div>
       </section>

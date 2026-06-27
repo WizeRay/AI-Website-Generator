@@ -3,12 +3,13 @@ import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { dummyProjects } from "../assets/assets";
 import { useSession } from "../../lib/auth-client";
+import api from "../configs/axios.config";
 
 
 function MyProjects() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);
-
+  const [error, setError] = useState(null)
   const navigate = useNavigate();
 
   const { data: session, isPending } = useSession();
@@ -27,19 +28,28 @@ function MyProjects() {
     }
 
   const fetchProjects = async () => {
-    
-    //Simulate loading
-    setTimeout(()=>{
-      setProjects(
-      dummyProjects
-      
-    )
-      setLoading(false)
-    },2000)
+    try {
+      const {data} = await api.get('/projects/');
+      setProjects(data.projects)
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
     
   }
   const deleteProject = async (projectId)=>{ 
-
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this project?');
+      if(!confirm) return;
+      await api.delete(`/${projectId}`);
+      fetchProjects()
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+    }
+    
   }
 
   useEffect(()=>{
@@ -49,6 +59,13 @@ function MyProjects() {
   return (
     <>
       <div className ="px-4 md:px-16 lg:px-24 xl:px-32">
+        
+        {error && (
+        <div className="mt-6 mb-2 text-center text-sm text-red-500">
+          {error}
+        </div>
+      )}
+
         {loading ? (
           <div className = 'flex items-center justify-center h-[80vh]'>
             <Loader2Icon className="size-7 animate-spin text-indigo-200"/>
@@ -92,7 +109,7 @@ function MyProjects() {
                     <p className="text-gray-400 mt-1 text-sm line-clamp-2">{project.initial_prompt}</p>
                     <div onClick={(e)=>e.stopPropagation()} 
                     className="flex justify-between items-center mt-6">
-                      <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                      <span>{new Date(project.created_at).toLocaleDateString()}</span>
                       <div className="flex gap-3 text-white text-sm">
                         <button onClick={()=> navigate(`/preview/${project.id}`)} className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all">Preview</button>
                         <button onClick={()=> navigate(`/projects/${project.id}`)} className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-colors">Open</button>

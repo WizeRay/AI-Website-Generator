@@ -1,37 +1,28 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { dummyProjects } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import ProjectPreview from "../components/ProjectPreview";
-import { useSession } from "../../lib/auth-client";
+import api from "../configs/axios.config";
 
 
 function View() {
-  const[projectId] = usePrams();
-  const[sode,setCode] = useState('');
+  const {projectId} = useParams();
+  const[code,setCode] = useState('');
   const [loading, setLoading] =  useState(true);
-  const { data: session, isPending } = useSession();
   
-    if (isPending) {
-      return (
-        <div className="flex justify-center mt-20">
-          Loading...
-        </div>
-      );
-    }
-  
-    if (!session) {
-      navigate("/login");
-      return null;
-    }
+    
   const fetchCode = async () => {
-    const code = dummyProjects.find(project=> project.id === projectId)?.current_code;
-    setTimeout(()=>{
-      if(code){
-        setCode(code);
-        setLoading(false);
-      }
-    },2000)
+   try {
+    const {data} = await api.get(`/published/${projectId}`)
+    setCode(data.project.current_code);
+    
+   } catch (err) {
+    console.log(err)
+    setError(err.response?.data?.message || "Something went wrong. Please try again.");
+
+   } finally{
+    setLoading(false);
+   }
   }
   useEffect(()=>{
     fetchCode()

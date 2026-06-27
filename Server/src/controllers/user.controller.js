@@ -14,7 +14,7 @@ export const getUserCredits = async (req,res) =>{
             
         `,[userId]);
 
-        res.json( userCredits.rows,
+        res.json( userCredits.rows[0],
         );
 
     } catch (err) {

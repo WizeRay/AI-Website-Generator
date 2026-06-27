@@ -44,7 +44,7 @@ const testDB =async () => {
 //--Application Routes--
 app.use('/api/projects', projectRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/', projectCodeRoutes);
+app.use('/api', projectCodeRoutes);
 
 //--Server start--
 app.listen(PORT, ()=>{
