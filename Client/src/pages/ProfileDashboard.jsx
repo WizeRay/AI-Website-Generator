@@ -1,6 +1,6 @@
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate } from "react-router";
 import { signOut } from "../../lib/auth-client";
-
+import { useSession } from "../components/sessionContextProvider";
 import {
   Card,
   CardContent,
@@ -14,7 +14,7 @@ import ProfileAvatar from "../components/ProfileAvatar";
 
 export default function ProfileDashboard() {
   const navigate = useNavigate();
-  const {session} = useOutletContext();
+  const {session} = useSession();
 
   const user = session.user;
 
