@@ -1,16 +1,15 @@
 import { useState } from "react";
 import {Loader2Icon} from "lucide-react";
 import { Link } from "react-router";
-import {  useSession } from "../../lib/auth-client";
 import { useNavigate } from "react-router";
 import api from "../configs/axios.config";
+import { useSession } from "../../lib/auth-client";
 function Home() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false)
-  const {data:session,isPending} = useSession();
   const navigate = useNavigate();
   const [error,setError] = useState("");
-
+  const {data:session} =useSession();
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     setError("");
@@ -64,7 +63,7 @@ function Home() {
         <form onSubmit={onSubmitHandler} className="bg-white/10 max-w-2xl w-full rounded-xl p-4 mt-10 border border-indigo-600/70 focus-within:ring-2 ring-indigo-500 transition-all">
           <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="Describe your presentation in details"/>
           <button 
-          disabled={loading || isPending}
+          disabled={loading}
           className="ml-auto flex items-center gap-2 bg-gradient-to-r from-[#CB52D4] to-indigo-600 rounded-md px-4 py-2">
                 {!loading? 'Create with AI':
                 <>

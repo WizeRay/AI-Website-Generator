@@ -1,10 +1,10 @@
 import { Navigate,Outlet } from "react-router";
-import { useSession } from "../../lib/auth-client";
+import { useSession } from "../components/sessionContextProvider"
 
 
 function ProtectedRoute() {
 
-    const {data: session, isPending } = useSession();
+    const { session, isPending } = useSession();
 
     if (isPending) {
         return (
@@ -18,13 +18,9 @@ function ProtectedRoute() {
         return <Navigate to="/login" replace />
     }
 
-    return <Outlet />
+    return <Outlet context ={{session}}/>
 
-  return (
-    <div>
-      
-    </div>
-  )
+  
 }
 
-export default ProtectedRoute
+export default ProtectedRoute;

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { useNavigate } from "react-router";
+import { useSession } from "../components/sessionContextProvider"
 import api from "../configs/axios.config"
-import { useSession } from "../../lib/auth-client";
 import ProfileAvatar from "./ProfileAvatar";
 import axios from "axios";
 function Navbar() {
@@ -10,8 +10,7 @@ function Navbar() {
   const [credits, setCredits] = useState(null);
   const [creditsLoading, setCreditsLoading] = useState(false);
   const navigate = useNavigate();
-  const { data: session, isPending } = useSession();
-
+  const {session} = useSession();
   useEffect(() => {
     if (!session) {
       setCredits(null);
@@ -44,9 +43,7 @@ function Navbar() {
     return () => controller.abort();
   }, [session]);
 
-  if (isPending) {
-    return <p>Loading..</p>;
-  }
+ 
 
   return (
     <div>

@@ -28,18 +28,20 @@ export default function LoginPage() {
 
       if (error) {
         setError(error.message || 'Invalid email or password.');
+        setIsLoading(false);
         return;
       }
-
-      // Session cookie is now set. Navigate to dashboard.
-      navigate('/projects');
+      // Small delay to let session state settle before navigating
+      setTimeout(() => {
+        navigate('/projects');
+      }, 600);
+      
 
     } catch (err) {
       setError('An unexpected error occurred.');
       console.error(err);
-    } finally {
       setIsLoading(false);
-    }
+    } 
   }
 
   return (

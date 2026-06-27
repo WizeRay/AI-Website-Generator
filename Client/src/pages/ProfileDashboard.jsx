@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router";
-import { useSession, signOut } from "../../lib/auth-client";
+import { useNavigate, useOutletContext } from "react-router";
+import { signOut } from "../../lib/auth-client";
 
 import {
   Card,
@@ -14,21 +14,7 @@ import ProfileAvatar from "../components/ProfileAvatar";
 
 export default function ProfileDashboard() {
   const navigate = useNavigate();
-
-  const { data: session, isPending } = useSession();
-
-  if (isPending) {
-    return (
-      <div className="flex justify-center mt-20">
-        Loading...
-      </div>
-    );
-  }
-
-  if (!session) {
-    navigate("/login");
-    return null;
-  }
+  const {session} = useOutletContext();
 
   const user = session.user;
 

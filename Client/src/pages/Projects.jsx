@@ -1,13 +1,14 @@
-import { useNavigate,useParams,Link } from "react-router";
+import { useNavigate,useParams,Link,useOutletContext } from "react-router";
 import {Loader2Icon,MessageSquare, XIcon,SmartphoneIcon, TabletIcon, LaptopIcon, SaveIcon,FullscreenIcon, ArrowBigDownDash,EyeOffIcon,EyeIcon} from "lucide-react";
 import { useState,useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import ProjectPreview from "../components/ProjectPreview";
-import { useSession } from "../../lib/auth-client";
 import api from "../configs/axios.config";
+
 function Projects() {
   const {projectId} = useParams();
   const navigate = useNavigate();
+
 
   const [project,setProject] = useState(null);
   const [loading,setLoading] = useState(true);
@@ -19,20 +20,7 @@ function Projects() {
   const [isSaving, setisSaving] = useState(false);
   const [error,setError] = useState(null);
   const previewRef = useRef(null);
-  const { data: session, isPending } = useSession();
-  
-    if (isPending) {
-      return (
-        <div className="flex justify-center mt-20">
-          Loading...
-        </div>
-      );
-    }
-  
-    if (!session) {
-      navigate("/login");
-      return null;
-    }
+   const {session} = useOutletContext(); 
 const fetchProject = async () =>{
 try{
   const {data} = await api.get(`/projects/${projectId}`);
@@ -88,9 +76,6 @@ const saveProject = async () => {
 useEffect(()=>{
   if(session.user){
     fetchProject();
-  }else if(!isPending && !session.user){
-    navigate("/");
-    return setError( "Please login to view your project")
   }
 },[session.user])
 

@@ -1,8 +1,6 @@
 import { useState,useEffect } from "react";
 import { Loader2Icon,PlusIcon,TrashIcon } from "lucide-react";
 import { useNavigate } from "react-router";
-import { dummyProjects } from "../assets/assets";
-import { useSession } from "../../lib/auth-client";
 import api from "../configs/axios.config";
 
 
@@ -10,22 +8,7 @@ function MyProjects() {
   const [loading,setLoading] = useState(true);
   const [projects,setProjects] = useState([]);
   const [error, setError] = useState(null)
-  const navigate = useNavigate();
-
-  const { data: session, isPending } = useSession();
-  
-    if (isPending) {
-      return (
-        <div className="flex justify-center mt-20">
-          Loading...
-        </div>
-      );
-    }
-  
-    if (!session) {
-      navigate("/login");
-      return null;
-    }
+  const navigate = useNavigate();  
 
   const fetchProjects = async () => {
     try {

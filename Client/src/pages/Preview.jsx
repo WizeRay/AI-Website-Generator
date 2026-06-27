@@ -2,7 +2,6 @@ import { useState,useEffect } from "react"
 import { useParams } from "react-router";
 import { Loader2Icon } from "lucide-react";
 import ProjectPreview from "../components/ProjectPreview";
-import { useSession } from "../../lib/auth-client";
 import api from "../configs/axios.config";
 
 function Preview() {
@@ -10,20 +9,8 @@ function Preview() {
   const [loading,setLoading] = useState(true);
   const [error,setError] = useState(null);
   const {projectId, versionId} = useParams();
-  const { data: session, isPending } = useSession();
   
-    if (isPending) {
-      return (
-        <div className="flex justify-center mt-20">
-          Loading...
-        </div>
-      );
-    }
   
-    if (!session) {
-      navigate("/login");
-      return null;
-    }
 
   const fetchCode = async () => {
     try {
