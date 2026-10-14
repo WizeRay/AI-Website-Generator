@@ -31,9 +31,13 @@ app.all('/api/auth/{*any}', toNodeHandler(auth));
 
 
 
-const testDB =async () => {
-    const result = await pool.query("SELECT NOW()");
-    console.log(result.rows);
+const testDB = async () => {
+    try {
+        const result = await pool.query("SELECT NOW()");
+        console.log("Database connected successfully:", result.rows[0]);
+    } catch (err) {
+        console.error("Database connection test failed:", err.message);
+    }
 }
 
 // const getusers =async () => {

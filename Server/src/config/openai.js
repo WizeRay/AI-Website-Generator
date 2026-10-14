@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  baseURL: "https://api.cerebras.ai/v1",
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
   apiKey: process.env.OPENROUTER_API_KEY,
   
 });
