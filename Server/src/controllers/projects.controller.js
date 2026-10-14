@@ -231,6 +231,7 @@ export const getProject = async (req, res) => {
 
     const projectData = {
       ...projectResult.rows[0],
+      isPublished: projectResult.rows[0].is_published,
       conversation: conversationResult.rows,
       versions: versionResult.rows,
     };

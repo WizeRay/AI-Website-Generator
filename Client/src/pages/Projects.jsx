@@ -37,8 +37,8 @@ try{
 
 const togglePublish = async () => {
   try {
-      await api.patch(`/projects/${projectId}/publish`);
-      setProject((prev)=> prev ? ({...prev, isPublished : !prev.isPublished}) : null)
+      const { data } = await api.patch(`/projects/${projectId}/publish`);
+      setProject((prev) => prev ? ({ ...prev, isPublished: data.isPublished, is_published: data.isPublished }) : null);
   } catch (err) {
     console.log(err);
     setError(err.response?.data?.message || "Something went wrong. Please try again.");
@@ -175,9 +175,9 @@ return project ? (
           <button
           onClick={togglePublish}
           className="bg-gradient-to-br from-indigo-700 to-indigo-600 hover:from-indigo-600 hover:to-indigo-500 text-white px-3.5 py-1 flex items-center gap-2 rounded sm:rounded-sm transition-colors">
-            {project.isPublished ?
+            {(project.isPublished ?? project.is_published) ?
             <EyeOffIcon size={16}/>: <EyeIcon size={16}/>}
-            {project.isPublished ? "Unpublish" : "Publish"}
+            {(project.isPublished ?? project.is_published) ? "Unpublish" : "Publish"}
           </button>
       </div>
     </div>

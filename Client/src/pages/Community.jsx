@@ -13,12 +13,12 @@ function Community() {
   const fetchProjects = async () => {
     try {
       const {data} = await api.get('/published');
-      setProjects(data.projects);
-      setLoading(false);
+      setProjects(data.projects || []);
     } catch (err) {
       console.log(err);
       setError(err.response?.data?.message || "Something went wrong. Please try again."); 
-
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -79,10 +79,12 @@ function Community() {
                       <span>{new Date(project.created_at).toLocaleDateString()}</span>
                       <div className="flex gap-3 text-white text-sm">
                         <button onClick={()=> navigate(`/preview/${project.id}`)} 
-                        className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all transition-colors flex items-centre gap-2"
+                        className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all transition-colors flex items-center gap-2"
                         >
-                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-center justify-center">{project.author_name.slice(0,1)}</span>
-                          {project.author_name}
+                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-center justify-center">
+                            {(project.author_name || 'U').slice(0,1).toUpperCase()}
+                          </span>
+                          {project.author_name || 'Anonymous'}
                         </button>
                       </div>
                     </div>

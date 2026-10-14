@@ -368,11 +368,12 @@ export const getPublishedProjects = async (req, res) => {
                 wp.id,
                 wp.name,
                 wp.current_code,
+                wp.initial_prompt,
                 wp.created_at,
-                u.name AS author_name,
+                COALESCE(u.name, 'Community Member') AS author_name,
                 u.email
             FROM website_project wp
-            JOIN "user" u
+            LEFT JOIN "user" u
             ON wp.user_id = u.id
             WHERE wp.is_published = TRUE
             ORDER BY wp.created_at DESC
